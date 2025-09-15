@@ -1,4 +1,4 @@
-from ..estructuras.lista_enlazada_simple import ListaEnlazadaSimple
+from estructuras.lista_enlazada_simple import ListaEnlazadaSimple
 
 class PlanRiego:
     def __init__(self, nombre):

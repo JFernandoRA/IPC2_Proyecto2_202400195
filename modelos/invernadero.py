@@ -1,4 +1,4 @@
-from ..estructuras.lista_enlazada_simple import ListaEnlazadaSimple
+from estructuras.lista_enlazada_simple import ListaEnlazadaSimple
 from .dron import Dron
 from .planta import Planta
 from .plan_riego import PlanRiego

@@ -1,4 +1,4 @@
-from ..estructuras.lista_enlazada_simple import ListaEnlazadaSimple
+from estructuras.lista_enlazada_simple import ListaEnlazadaSimple
 
 class Dron:
     def __init__(self, id_dron, nombre):
