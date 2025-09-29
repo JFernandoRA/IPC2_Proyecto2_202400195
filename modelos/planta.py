@@ -5,6 +5,6 @@ class Planta:
         self.litros_agua = litros_agua
         self.gramos_fertilizante = gramos_fertilizante
         self.tipo = tipo
-    
+
     def __str__(self):
         return f"Planta(H{self.hilera}-P{self.posicion}, {self.tipo}, Agua: {self.litros_agua}L, Fert: {self.gramos_fertilizante}g)"

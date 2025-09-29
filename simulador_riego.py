@@ -1,106 +1,141 @@
-def generar_instrucciones_para_plan(invernadero, nombre_plan):
-    plan_obj = None
-    for plan in invernadero.planes_riego:
-        if plan.nombre == nombre_plan:
-            plan_obj = plan
-            break
+from estructuras.lista_enlazada_simple import ListaEnlazadaSimple
 
+def generar_instrucciones_para_plan(invernadero, nombre_plan):
+    print(f"\n=== GENERANDO INSTRUCCIONES PARA PLAN: {nombre_plan} ===")
+    
+    # Buscar el plan
+    plan_obj = None
+    for p in invernadero.planes_riego:
+        if p.nombre == nombre_plan:
+            plan_obj = p
+            break
+    
     if plan_obj is None:
-        print(f"Error: No se encontró el plan '{nombre_plan}' en el invernadero '{invernadero.nombre}'.")
+        print(f"ERROR: No se encontró el plan {nombre_plan}")
         return 0
 
-    # Reiniciar las instrucciones de todos los drones
-    for dron in invernadero.drones:
-        dron.instrucciones = type(dron.instrucciones)()  # Crea una nueva instancia vacía del mismo tipo
-        dron.reiniciar_posicion()
+    print(f"Plan encontrado: {nombre_plan} con {len(plan_obj.secuencia)} pasos")
+    for i, paso in enumerate(plan_obj.secuencia):
+        print(f"  Paso {i+1}: {paso}")
 
-    # Convertir la secuencia del plan en una lista de ubicaciones (hilera, posicion)
-    pasos_plan = []
-    for paso_str in plan_obj.secuencia:
-        if not paso_str:
+    # REINICIAR DRONES COMPLETAMENTE para este plan
+    for d in invernadero.drones:
+        d.instrucciones = ListaEnlazadaSimple()
+        d.posicion_actual = 0
+        d.litros_agua_utilizados = 0
+        d.gramos_fertilizante_utilizados = 0
+
+    # Segundo 1: todos avanzan a P1
+    for d in invernadero.drones:
+        d.posicion_actual = 1
+        d.agregar_instruccion(f"Adelante (H{d.hilera_asignada}P1)")
+
+    # Procesar cada paso del plan en ORDEN
+    for paso_num, paso in enumerate(plan_obj.secuencia):
+        if not isinstance(paso, str):
             continue
-        # Formato esperado: "H1-P2"
+        
+        s = paso.strip()
+        if s == "" or not s.startswith('H'):
+            continue
+        
+        print(f"Procesando paso {paso_num+1}: {s}")
+        
         try:
-            partes = paso_str.replace('H', '').replace('P', '').split('-')
-            hilera = int(partes[0])
-            posicion = int(partes[1])
-            pasos_plan.append((hilera, posicion))
-        except (ValueError, IndexError):
-            print(f"Advertencia: Paso '{paso_str}' no tiene formato válido. Se omitirá.")
+            # Parsear formato "H1-P2" o "H1P2"
+            s_limpio = s.replace(' ', '').replace('-', '')
+            hilera_str = ""
+            pos_str = ""
+            encontro_p = False
+            
+            for char in s_limpio:
+                if char == 'H':
+                    continue
+                elif char == 'P':
+                    encontro_p = True
+                    continue
+                else:
+                    if not encontro_p:
+                        hilera_str += char
+                    else:
+                        pos_str += char
+            
+            if hilera_str and pos_str:
+                hilera = int(hilera_str)
+                pos = int(pos_str)
+                print(f"  Interpretado: Hilera {hilera}, Posición {pos}")
+            else:
+                print(f"  ERROR: No se pudo interpretar {s}")
+                continue
+                
+        except Exception as e:
+            print(f"  ERROR parseando {s}: {e}")
             continue
 
-    # Para cada paso en el plan, calcular las instrucciones para todos los drones
-    tiempo_actual = 0
-
-    for idx_paso, (hilera_objetivo, posicion_objetivo) in enumerate(pasos_plan):
-        # Encontrar el dron asignado a esta hilera
+        # Encontrar dron para esta hilera
         dron_activo = None
-        for dron in invernadero.drones:
-            if dron.hilera_asignada == hilera_objetivo:
-                dron_activo = dron
+        for d in invernadero.drones:
+            if d.hilera_asignada == hilera:
+                dron_activo = d
                 break
-
+        
         if dron_activo is None:
-            print(f"Advertencia: No hay dron asignado a la hilera {hilera_objetivo}. Paso omitido.")
+            print(f"  ERROR: No hay dron asignado a hilera {hilera}")
             continue
 
-        # Calcular cuántos segundos necesita el dron activo para llegar a la posición
-        distancia = abs(dron_activo.posicion_actual - posicion_objetivo)
-        direccion = "Adelante" if posicion_objetivo > dron_activo.posicion_actual else "Retroceder"
+        # Buscar planta
+        planta = invernadero.buscar_planta_por_ubicacion(hilera, pos)
+        if planta is None:
+            print(f"  ERROR: No se encontró planta en H{hilera}P{pos}")
+            continue
 
-        # Generar instrucciones de movimiento para el dron activo
-        for i in range(distancia):
-            if direccion == "Adelante":
-                dron_activo.avanzar()
-                accion = f"Adelante(H{hilera_objetivo}P{dron_activo.posicion_actual})"
+        print(f"  Planta encontrada: {planta.tipo}, Agua: {planta.litros_agua}L, Fert: {planta.gramos_fertilizante}g")
+
+        # Mover dron activo a la posición
+        print(f"  Dron {dron_activo.nombre} en posición {dron_activo.posicion_actual}, moviendo a {pos}")
+        
+        while dron_activo.posicion_actual < pos:
+            dron_activo.posicion_actual += 1
+            for d in invernadero.drones:
+                if d == dron_activo:
+                    d.agregar_instruccion(f"Adelante (H{hilera}P{d.posicion_actual})")
+                else:
+                    d.agregar_instruccion("Esperar")
+            print(f"    Avanzó a posición {dron_activo.posicion_actual}")
+        
+        while dron_activo.posicion_actual > pos:
+            dron_activo.posicion_actual -= 1
+            for d in invernadero.drones:
+                if d == dron_activo:
+                    d.agregar_instruccion(f"Atras (H{hilera}P{d.posicion_actual})")
+                else:
+                    d.agregar_instruccion("Esperar")
+            print(f"    Retrocedió a posición {dron_activo.posicion_actual}")
+
+        # Regar
+        print(f"  REGANDO: Dron {dron_activo.nombre} agrega {planta.litros_agua}L y {planta.gramos_fertilizante}g")
+        dron_activo.litros_agua_utilizados += planta.litros_agua
+        dron_activo.gramos_fertilizante_utilizados += planta.gramos_fertilizante
+        
+        for d in invernadero.drones:
+            if d == dron_activo:
+                d.agregar_instruccion(f"Regar (H{hilera}-P{pos})")
             else:
-                dron_activo.retroceder()
-                accion = f"Retroceder(H{hilera_objetivo}P{dron_activo.posicion_actual})"
-            dron_activo.agregar_instruccion(accion)
-            tiempo_actual += 1
+                d.agregar_instruccion("Esperar")
 
-            # Mientras el dron activo se mueve, los demás deben "Esperar"
-            for otro_dron in invernadero.drones:
-                if otro_dron != dron_activo:
-                    otro_dron.agregar_instruccion("Esperar")
-
-        # El dron activo riega
-        planta = invernadero.buscar_planta_por_ubicacion(hilera_objetivo, posicion_objetivo)
-        if planta:
-            dron_activo.regar(planta.litros_agua, planta.gramos_fertilizante)
-            accion_riego = "Regar"
-        else:
-            accion_riego = "Regar"  # Asumimos que riega aunque no encontremos la planta (por consistencia)
-
-        dron_activo.agregar_instruccion(accion_riego)
-        tiempo_actual += 1
-
-        # Los demás drones "Esperan" durante el riego
-        for otro_dron in invernadero.drones:
-            if otro_dron != dron_activo:
-                otro_dron.agregar_instruccion("Esperar")
-
-    # Después del último riego, todos los drones deben regresar a la posición 0
-    for dron in invernadero.drones:
-        distancia_vuelta = abs(dron.posicion_actual - 0)
-        direccion_vuelta = "Retroceder" if dron.posicion_actual > 0 else "Adelante"
-
-        for i in range(distancia_vuelta):
-            if direccion_vuelta == "Retroceder":
-                dron.retroceder()
-                accion = f"Retroceder(H{dron.hilera_asignada}P{dron.posicion_actual})"
-            else:
-                dron.avanzar()
-                accion = f"Adelante(H{dron.hilera_asignada}P{dron.posicion_actual})"
-            dron.agregar_instruccion(accion)
-            tiempo_actual += 1
-
-            # Los demás drones esperan
-            for otro_dron in invernadero.drones:
-                if otro_dron != dron:
-                    otro_dron.agregar_instruccion("Esperar")
-
-        # Finalmente, agregar "FIN"
-        dron.agregar_instruccion("FIN")
-
-    return tiempo_actual
+    # Alinear con FIN
+    max_len = 0
+    for d in invernadero.drones:
+        if len(d.instrucciones) > max_len:
+            max_len = len(d.instrucciones)
+    
+    for d in invernadero.drones:
+        while len(d.instrucciones) < max_len:
+            d.agregar_instruccion("FIN")
+    
+    # Mostrar resumen final
+    print(f"\nRESUMEN PLAN {nombre_plan}:")
+    for d in invernadero.drones:
+        print(f"  {d.nombre}: {d.litros_agua_utilizados}L, {d.gramos_fertilizante_utilizados}g")
+    
+    return max_len

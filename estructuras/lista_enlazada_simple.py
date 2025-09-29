@@ -2,8 +2,8 @@ from .nodo import Nodo
 
 class ListaEnlazadaSimple:
     def __init__(self):
-        self.cabeza = None      
-        self.tamanio = 0       
+        self.cabeza = None
+        self.tamanio = 0
 
     def esta_vacia(self):
         return self.cabeza is None
@@ -25,20 +25,20 @@ class ListaEnlazadaSimple:
         actual = self.cabeza
         for _ in range(indice):
             actual = actual.siguiente
-        return actual.dato
+        return actual.data  # Aquí está bien
 
     def buscar(self, criterio):
         actual = self.cabeza
         while actual is not None:
-            if criterio(actual.dato):
-                return actual.dato
+            if criterio(actual.data):  # Aquí está bien
+                return actual.data  # Aquí está bien
             actual = actual.siguiente
         return None
 
     def __iter__(self):
         actual = self.cabeza
         while actual is not None:
-            yield actual.dato
+            yield actual.data  # Aquí está bien
             actual = actual.siguiente
 
     def __len__(self):
@@ -49,9 +49,9 @@ class ListaEnlazadaSimple:
             return "[]"
         resultado = ""
         primero = True
-        for dato in self:
+        for data in self:
             if not primero:
                 resultado += " -> "
-            resultado += str(dato)
+            resultado += str(data)
             primero = False
         return "[" + resultado + "]"

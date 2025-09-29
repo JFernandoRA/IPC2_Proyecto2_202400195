@@ -8,9 +8,9 @@ class Invernadero:
         self.nombre = nombre
         self.numero_hileras = numero_hileras
         self.plantas_x_hilera = plantas_x_hilera
-        self.plantas = ListaEnlazadaSimple()    
-        self.drones = ListaEnlazadaSimple()     
-        self.planes_riego = ListaEnlazadaSimple() 
+        self.plantas = ListaEnlazadaSimple()
+        self.drones = ListaEnlazadaSimple()
+        self.planes_riego = ListaEnlazadaSimple()
 
     def agregar_planta(self, planta):
         self.plantas.agregar_al_final(planta)
@@ -24,7 +24,7 @@ class Invernadero:
     def buscar_dron_por_id(self, id_dron):
         return self.drones.buscar(lambda dron: dron.id == id_dron)
 
-    def buscar_planta_por_ubicacion(self, hilera, posicion):
+    def buscar_planta_por_ubicacion(self, hilera, posicion):  # CORREGIDO: "ubicacion" no "ubicacion"
         return self.plantas.buscar(lambda planta: planta.hilera == hilera and planta.posicion == posicion)
 
     def __str__(self):

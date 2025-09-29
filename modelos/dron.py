@@ -4,11 +4,11 @@ class Dron:
     def __init__(self, id_dron, nombre):
         self.id = id_dron
         self.nombre = nombre
-        self.hilera_asignada = None      
-        self.posicion_actual = 0         
+        self.hilera_asignada = None
+        self.posicion_actual = 0
         self.litros_agua_utilizados = 0
         self.gramos_fertilizante_utilizados = 0
-        self.instrucciones = ListaEnlazadaSimple() 
+        self.instrucciones = ListaEnlazadaSimple()
 
     def asignar_a_hilera(self, numero_hilera):
         self.hilera_asignada = numero_hilera
@@ -25,7 +25,7 @@ class Dron:
         self.gramos_fertilizante_utilizados += gramos
 
     def agregar_instruccion(self, accion):
-        self.instrucciones.agregar_al_final(accion)  
+        self.instrucciones.agregar_al_final(accion)
 
     def reiniciar_posicion(self):
         self.posicion_actual = 0
@@ -37,4 +37,4 @@ class Dron:
             return "Esperar"
 
     def __str__(self):
-        return f"Dron({self.nombre}, Hilera: {self.hilera_asignada}, Pos: {self.posicion_actual})"
+        return f"Dron {self.nombre}, Hilera: {self.hilera_asignada}, Pos: {self.posicion_actual}"

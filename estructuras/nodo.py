@@ -1,4 +1,4 @@
 class Nodo:
-    def __init__(self, dato=None):
-        self.dato = dato
+    def __init__(self, data=None):
+        self.data = data
         self.siguiente = None
