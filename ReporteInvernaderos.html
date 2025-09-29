@@ -1,6 +1,4 @@
-def generar_reporte_html(lista_invernaderos, ruta_salida="ReporteInvernaderos.html"):
-
-    html = """<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -141,61 +139,36 @@ def generar_reporte_html(lista_invernaderos, ruta_salida="ReporteInvernaderos.ht
             <p class="lead mb-0">GuateRiegos 2.0 - Reporte de Eficiencia</p>
         </div>
     </div>
-    <div class="container">"""
-
-    # Iterar sobre invernaderos
-    for invernadero in lista_invernaderos:
-        html += f"""
+    <div class="container">
         <div class="card">
             <div class="card-header">
-                <h2>{invernadero.nombre}</h2>
-                <p class="mb-0">Configuración: {invernadero.numero_hileras} hileras × {invernadero.plantas_x_hilera} plantas</p>
+                <h2>Invernadero San Marcos</h2>
+                <p class="mb-0">Configuración: 4 hileras × 3 plantas</p>
             </div>
-            <div class="card-body">"""
-        
-        # Para cada plan - SIMULAR CADA UNO POR SEPARADO
-        for plan in invernadero.planes_riego:
-            html += f"""
+            <div class="card-body">
                 <div class="plan-card">
                     <div class="plan-header">
-                        <h3 class="mb-0">Plan: {plan.nombre}</h3>
+                        <h3 class="mb-0">Plan: Dia 1</h3>
                     </div>
-                    <div class="card-body">"""
-            
-            # SIMULAR ESTE PLAN ESPECÍFICO para obtener sus datos
-            from simulador_riego import generar_instrucciones_para_plan
-            tiempo_optimo = generar_instrucciones_para_plan(invernadero, plan.nombre)
-            
-            # Calcular estadísticas para ESTE plan
-            total_agua = 0
-            total_fert = 0
-            for dron in invernadero.drones:
-                total_agua += dron.litros_agua_utilizados
-                total_fert += dron.gramos_fertilizante_utilizados
-            
-            # --- ESTADÍSTICAS PRINCIPALES ---
-            html += f"""
+                    <div class="card-body">
                         <div class="stats-grid">
                             <div class="stat-card">
-                                <div class="stat-number">{tiempo_optimo}s</div>
+                                <div class="stat-number">8s</div>
                                 <div class="stat-label">Tiempo Óptimo</div>
                             </div>
                             <div class="stat-card">
-                                <div class="stat-number">{total_agua}L</div>
+                                <div class="stat-number">9L</div>
                                 <div class="stat-label">Agua Total</div>
                             </div>
                             <div class="stat-card">
-                                <div class="stat-number">{total_fert}g</div>
+                                <div class="stat-number">350g</div>
                                 <div class="stat-label">Fertilizante Total</div>
                             </div>
                             <div class="stat-card">
-                                <div class="stat-number">{len(plan.secuencia)}</div>
+                                <div class="stat-number">4</div>
                                 <div class="stat-label">Plantas Regadas</div>
                             </div>
-                        </div>"""
-            
-            # --- EFICIENCIA POR DRON ---
-            html += """
+                        </div>
                         <h4 class="section-title">Eficiencia por Dron</h4>
                         <table class='table table-success table-custom efficiency-table'>
                             <thead>
@@ -207,102 +180,131 @@ def generar_reporte_html(lista_invernaderos, ruta_salida="ReporteInvernaderos.ht
                                     <th>Estado</th>
                                 </tr>
                             </thead>
-                            <tbody>"""
-            
-            for dron in invernadero.drones:
-                estado = "Activo" if dron.litros_agua_utilizados > 0 else "Inactivo"
-                html += f"""
+                            <tbody>
                                 <tr>
-                                    <td><strong>{dron.nombre}</strong></td>
-                                    <td>H{dron.hilera_asignada}</td>
-                                    <td>{dron.litros_agua_utilizados}</td>
-                                    <td>{dron.gramos_fertilizante_utilizados}</td>
-                                    <td><span class="badge-custom">{estado}</span></td>
-                                </tr>"""
-            
-            html += """
+                                    <td><strong>DR01</strong></td>
+                                    <td>H1</td>
+                                    <td>3</td>
+                                    <td>200</td>
+                                    <td><span class="badge-custom">Activo</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>DR02</strong></td>
+                                    <td>H2</td>
+                                    <td>1</td>
+                                    <td>25</td>
+                                    <td><span class="badge-custom">Activo</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>DR03</strong></td>
+                                    <td>H3</td>
+                                    <td>4</td>
+                                    <td>100</td>
+                                    <td><span class="badge-custom">Activo</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>DR04</strong></td>
+                                    <td>H4</td>
+                                    <td>1</td>
+                                    <td>25</td>
+                                    <td><span class="badge-custom">Activo</span></td>
+                                </tr>
                             </tbody>
-                        </table>"""
-            
-            # --- ASIGNACIÓN DE DRONES ---
-            html += """
+                        </table>
                         <h4 class="section-title">Asignación de Drones</h4>
-                        <div class="row">"""
-            
-            for dron in invernadero.drones:
-                html += f"""
+                        <div class="row">
                             <div class="col-md-4 mb-3">
                                 <div class="card border-primary dron-card">
                                     <div class="card-body text-center">
-                                        <h5 class="card-title">{dron.nombre}</h5>
+                                        <h5 class="card-title">DR01</h5>
                                         <p class="card-text">
-                                            <strong>Hilera:</strong> H{dron.hilera_asignada}<br>
-                                            <strong>Posición Actual:</strong> P{dron.posicion_actual}<br>
-                                            <strong>Instrucciones:</strong> {len(dron.instrucciones)}
+                                            <strong>Hilera:</strong> H1<br>
+                                            <strong>Posición Actual:</strong> P0<br>
+                                            <strong>Instrucciones:</strong> 8
                                         </p>
                                     </div>
                                 </div>
-                            </div>"""
-            
-            html += """
-                        </div>"""
-            
-            # --- INSTRUCCIONES POR TIEMPO ---
-            html += """
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="card border-primary dron-card">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">DR02</h5>
+                                        <p class="card-text">
+                                            <strong>Hilera:</strong> H2<br>
+                                            <strong>Posición Actual:</strong> P0<br>
+                                            <strong>Instrucciones:</strong> 8
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="card border-primary dron-card">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">DR03</h5>
+                                        <p class="card-text">
+                                            <strong>Hilera:</strong> H3<br>
+                                            <strong>Posición Actual:</strong> P0<br>
+                                            <strong>Instrucciones:</strong> 8
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="card border-primary dron-card">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">DR04</h5>
+                                        <p class="card-text">
+                                            <strong>Hilera:</strong> H4<br>
+                                            <strong>Posición Actual:</strong> P0<br>
+                                            <strong>Instrucciones:</strong> 8
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <h4 class="section-title">Instrucciones por Segundo</h4>
                         <div class="table-responsive">
                             <table class='table table-bordered table-custom instructions-table'>
                                 <thead>
                                     <tr>
-                                        <th>Segundo</th>"""
-            
-            # Encabezados de drones
-            for dron in invernadero.drones:
-                html += f"<th>{dron.nombre}</th>"
-            
-            html += """
+                                        <th>Segundo</th><th>DR01</th><th>DR02</th><th>DR03</th><th>DR04</th>
                                     </tr>
                                 </thead>
-                                <tbody>"""
-            
-            # Filas de instrucciones
-            if not invernadero.drones.esta_vacia():
-                primer_dron = invernadero.drones.obtener_en_indice(0)
-                max_segundos = len(primer_dron.instrucciones)
-                
-                for t in range(max_segundos):
-                    html += f"""
+                                <tbody>
                                     <tr>
-                                        <td><strong>{t + 1}</strong></td>"""
-                    
-                    for dron in invernadero.drones:
-                        accion = dron.obtener_instruccion_en_segundo(t)
-                        html += f"<td>{accion}</td>"
-                    
-                    html += """
-                                    </tr>"""
-            
-            html += """
+                                        <td><strong>1</strong></td><td>Adelante (H1P1)</td><td>Adelante (H2P1)</td><td>Adelante (H3P1)</td><td>Adelante (H4P1)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>2</strong></td><td>Adelante (H1P2)</td><td>Adelante (H2P2)</td><td>Adelante (H3P2)</td><td>Regar (H4-P1)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>3</strong></td><td>Adelante (H1P3)</td><td>Adelante (H2P3)</td><td>Regar (H3-P2)</td><td>FIN</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>4</strong></td><td>Regar (H1-P3)</td><td>Esperar</td><td>Atrás (H3P1)</td><td>FIN</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>5</strong></td><td>Atrás (H1P2)</td><td>Regar (H2-P3)</td><td>FIN</td><td>FIN</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>6</strong></td><td>Atrás (H1P1)</td><td>Atrás (H2P2)</td><td>FIN</td><td>FIN</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>7</strong></td><td>FIN</td><td>Atrás (H2P1)</td><td>FIN</td><td>FIN</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>8</strong></td><td>FIN</td><td>FIN</td><td>FIN</td><td>FIN</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
-                </div>"""  # Cierre de plan-card
-        
-        html += """
+                </div>
             </div>
-        </div>"""
-    
-    html += """
+        </div>
         <footer class="text-center mt-5 mb-4">
             <p class="text-muted">Sistema GuateRiegos 2.0 • Generado automáticamente</p>
         </footer>
     </div>
 </body>
-</html>"""
-
-    # Guardar el archivo
-    with open(ruta_salida, 'w', encoding='utf-8') as f:
-        f.write(html)
-    
-    print(f"Reporte HTML generado: {ruta_salida}")
+</html>

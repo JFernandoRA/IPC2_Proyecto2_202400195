@@ -1,10 +1,6 @@
 from estructuras.lista_enlazada_simple import ListaEnlazadaSimple
 
 def generar_salida_xml(lista_invernaderos, ruta_salida="salida.xml"):
-    """
-    Genera un archivo XML de salida con la información de todos los invernaderos y planes.
-    """
-    
     contenido_xml = '<?xml version="1.0"?>\n<datosSalida>\n  <listaInvernaderos>\n'
 
     # Iterar sobre invernaderos

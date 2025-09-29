@@ -81,13 +81,13 @@ function llenarPlanes(planes) {
 function simularPlan() {
     const selectInvernadero = document.getElementById('selectInvernadero');
     const selectPlan = document.getElementById('selectPlan');
-    
+
     if (selectInvernadero.value === 'Seleccionar invernadero' || 
         selectPlan.value === 'Seleccionar plan') {
         alert('Por favor selecciona un invernadero y un plan');
         return;
     }
-    
+
     const datos = {
         invernadero: selectInvernadero.value,
         plan: selectPlan.value
@@ -219,20 +219,31 @@ function mostrarMensaje(mensaje, tipo) {
 function generarGrafo() {
     const inputTiempo = document.getElementById('inputTiempo');
     const selectTipo = document.getElementById('selectTipoGrafo');
-    
+    const selectInvernadero = document.getElementById('selectInvernadero');
+    const selectPlan = document.getElementById('selectPlan');
+
     const tiempo = parseInt(inputTiempo.value);
     const tipo = selectTipo.value;
-    
+    const invernadero = selectInvernadero.value;
+    const plan = selectPlan.value;
+
     if (!tiempo || tiempo < 1) {
         mostrarMensaje('Por favor ingresa un tiempo válido', 'error');
         return;
     }
-    
+
+    if (invernadero === 'Seleccionar invernadero' || plan === 'Seleccionar plan') {
+        mostrarMensaje('Por favor selecciona un invernadero y un plan primero', 'error');
+        return;
+    }
+
     const datos = {
         tiempo: tiempo,
-        tipo: tipo
+        tipo: tipo,
+        invernadero: invernadero,
+        plan: plan
     };
-    
+
     fetch('/generar_grafo', {
         method: 'POST',
         headers: {
@@ -248,6 +259,10 @@ function generarGrafo() {
         } else {
             mostrarMensaje('Error: ' + data.error, 'error');
         }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        mostrarMensaje('Error al generar el gráfico', 'error');
     });
 }
 

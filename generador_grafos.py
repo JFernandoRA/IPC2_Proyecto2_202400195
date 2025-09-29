@@ -48,7 +48,7 @@ def generar_grafo_lista_plan(plan_riego, tiempo):
         actual = actual.siguiente
         indice += 1
     
-    # ✅ AGREGAR FIN COMO UN NODO NORMAL EN LA MISMA SECUENCIA
+   
     if tiempo > len(plan_riego.secuencia):
         fin_id = 'fin'
         dot.node(fin_id, f'FIN\n(Completado)', 
@@ -59,7 +59,7 @@ def generar_grafo_lista_plan(plan_riego, tiempo):
             ultimo_nodo = nodos_creados[-1]
             dot.edge(ultimo_nodo, fin_id)
     
-    # ✅ FORZAR ORDEN HORIZONTAL USANDO RANK
+  
     if nodos_creados:
         dot.attr(rank='same')
         # Crear una cadena de ranking para mantener el orden
